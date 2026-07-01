@@ -1,13 +1,12 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { fileURLToPath, URL } from "node:url";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
   server: {
@@ -15,18 +14,18 @@ export default defineConfig({
     open: true,
   },
   build: {
-    outDir: 'dist',
+    outDir: "dist",
     sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router'],
-          motion: ['framer-motion'],
-          query: ['@tanstack/react-query'],
-          viewer: ['react-zoom-pan-pinch'],
+          vendor: ["react", "react-dom"],
+          router: ["react-router"],
+          motion: ["framer-motion"],
+          query: ["@tanstack/react-query"],
+          viewer: ["react-zoom-pan-pinch"],
         },
       },
     },
   },
-})
+});
