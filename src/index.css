@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   GLOBAL BASE STYLES
+   ============================================================ */
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #root {
+    @apply h-full;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+    @apply dark:bg-gov-950 dark:text-gray-100;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+    @apply dark:bg-gov-700;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+    @apply dark:bg-gov-600;
+  }
+}
+
+/* ============================================================
+   COMPONENT UTILITIES
+   ============================================================ */
+
+@layer components {
+
+  /* Glass morphism panel */
+  .glass-panel {
+    @apply backdrop-blur-md bg-white/80 border border-white/20 shadow-glass;
+    @apply dark:bg-gov-900/80 dark:border-gov-700/20 dark:shadow-glass-dark;
+  }
+
+  /* Scrollbar utilities */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Keyboard shortcut badge */
+  kbd {
+    @apply inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-mono rounded;
+    @apply bg-gray-100 text-gray-700 border border-gray-300;
+    @apply dark:bg-gov-800 dark:text-gov-300 dark:border-gov-700;
+    font-size: 0.7rem;
+    min-width: 1.4rem;
+  }
+}
+
+/* ============================================================
+   ANIMATION UTILITIES
+   ============================================================ */
+
+@layer utilities {
+  .animate-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-400 to-gov-300;
+  }
+
+  /* Image fit for map viewer */
+  .map-image {
+    @apply w-full h-full object-contain select-none pointer-events-none;
+    user-drag: none;
+    -webkit-user-drag: none;
+  }
+}
+
+/* ============================================================
+   REACT ZOOM PAN PINCH OVERRIDES
+   ============================================================ */
+
+.react-transform-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.react-transform-component {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ============================================================
+   PRESENTATION MODE
+   ============================================================ */
+
+.presentation-mode {
+  @apply fixed inset-0 z-50;
+}
+
+/* ============================================================
+   SELECTION COLORS
+   ============================================================ */
+
+::selection {
+  @apply bg-accent-500/30 text-white;
+}
+
+/* ============================================================
+   FOCUS VISIBLE
+   ============================================================ */
+
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-accent-500 rounded-sm;
+}
