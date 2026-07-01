@@ -88,10 +88,10 @@ export default function PresentationPage() {
       transition={{ duration: 0.35 }}
     >
       {/* Exit button */}
-      <motion.button
+      {/* <motion.button
         onClick={handleExit}
         className={`
-          absolute top-4 right-4 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+          absolute top-4 right-15 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
           ${isDark
             ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30'
             : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
@@ -107,7 +107,7 @@ export default function PresentationPage() {
       >
         <X className="w-3.5 h-3.5" />
         Thoát (ESC)
-      </motion.button>
+      </motion.button> */}
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">

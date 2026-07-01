@@ -118,7 +118,7 @@ export const Header = memo(function Header() {
       {/* Right — Controls */}
       <div className="flex items-center gap-1.5">
         {/* Presentation Mode button */}
-        {isPresenting ? (
+        {/* {isPresenting ? (
           <motion.button
             onClick={exitPresentation}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
@@ -129,7 +129,7 @@ export const Header = memo(function Header() {
             <Monitor className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Thoát trình chiếu</span>
           </motion.button>
-        ) : null}
+        ) : null} */}
 
         {/* Dark mode toggle */}
         <motion.button
