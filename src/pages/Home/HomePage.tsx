@@ -101,14 +101,13 @@ export default function HomePage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* LEFT — Sidebar */}
-      <Sidebar
-        villages={villages}
-        currentIndex={currentIndex}
-        onVillageSelect={handleVillageSelect}
-        onPrev={handlePrev}
-        onNext={handleNext}
-      />
+      {/* LEFT — Information Panel */}
+      {infoPanelOpen && (
+        <InformationPanel
+          village={selectedVillage}
+          onClose={() => setInfoPanelOpen(false)}
+        />
+      )}
 
       {/* CENTER — Map Viewer */}
       <MapViewer
@@ -118,13 +117,14 @@ export default function HomePage() {
         label={selectedVillage?.name ?? 'Tổng quan'}
       />
 
-      {/* RIGHT — Information Panel */}
-      {infoPanelOpen && (
-        <InformationPanel
-          village={selectedVillage}
-          onClose={() => setInfoPanelOpen(false)}
-        />
-      )}
+      {/* RIGHT — Sidebar */}
+      <Sidebar
+        villages={villages}
+        currentIndex={currentIndex}
+        onVillageSelect={handleVillageSelect}
+        onPrev={handlePrev}
+        onNext={handleNext}
+      />
     </motion.div>
   );
 }
