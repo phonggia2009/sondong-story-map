@@ -12,8 +12,7 @@ import {
 import { useAppContext } from '@/context/AppContext';
 import { BoundaryRow } from './BoundaryRow';
 import { LandmarkList } from './LandmarkList';
-import { ImageWithFallback } from '@/components/MapViewer/ImageWithFallback';
-import { getVillageImageUrl } from '@/config';
+
 import type { Village } from '@/types';
 
 // ============================================================
@@ -115,31 +114,23 @@ export const InformationPanel = memo(function InformationPanel({
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
           >
-            {/* Village image hero */}
-            <div className="flex-shrink-0 relative h-44 overflow-hidden">
-              <ImageWithFallback
-                src={getVillageImageUrl(village.image)}
-                alt={village.name}
-                className="w-full h-full"
-                fallbackText={village.name}
-                priority
-              />
-
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-
-              {/* Village name overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h2 className="text-xl font-display font-bold text-white leading-tight">
-                  {village.name}
-                </h2>
-              </div>
-
-              {/* Close button */}
+            {/* Village name header */}
+            <div className={`flex-shrink-0 flex items-center justify-between px-4 py-4 border-b ${
+              isDark ? 'border-gov-800' : 'border-gray-200'
+            }`}>
+              <h2 className={`text-base font-display font-bold leading-tight ${
+                isDark ? 'text-white' : 'text-gray-800'
+              }`}>
+                {village.name}
+              </h2>
               {onClose && (
                 <motion.button
                   onClick={onClose}
-                  className="absolute top-3 right-3 p-1.5 rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
+                  className={`p-1.5 rounded-full transition-colors ${
+                    isDark
+                      ? 'text-gov-400 hover:bg-gov-800 hover:text-white'
+                      : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'
+                  }`}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
