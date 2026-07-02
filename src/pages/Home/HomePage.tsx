@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PanelLeftOpen } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { useVillages } from '@/hooks/useVillages';
 import { useKeyboard } from '@/hooks/useKeyboard';
@@ -23,7 +24,9 @@ export default function HomePage() {
     selectVillage,
     infoPanelOpen,
     setInfoPanelOpen,
+    toggleInfoPanel,
     isPresenting,
+    isDark,
   } = useAppContext();
 
   const { villages, isLoading, isError, error, refetch } = useVillages();
@@ -101,21 +104,55 @@ export default function HomePage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* LEFT — Information Panel */}
-      {infoPanelOpen && (
-        <InformationPanel
-          village={selectedVillage}
-          onClose={() => setInfoPanelOpen(false)}
-        />
-      )}
+      {/* LEFT — Information Panel (chỉ hiện khi có thôn được chọn) */}
+      <AnimatePresence>
+        {infoPanelOpen && selectedVillage && (
+          <InformationPanel
+            village={selectedVillage}
+            onClose={() => setInfoPanelOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* CENTER — Map Viewer */}
-      <MapViewer
-        imageUrl={imageUrl}
-        imageAlt={imageAlt}
-        isOverview={!selectedVillage}
-        label={selectedVillage?.name ?? 'Tổng quan'}
-      />
+      <div className="relative flex-1 flex overflow-hidden">
+        <MapViewer
+          imageUrl={imageUrl}
+          imageAlt={imageAlt}
+          isOverview={!selectedVillage}
+          label={selectedVillage?.name ?? 'Tổng quan'}
+        />
+
+        {/* Nút mở lại panel — chỉ hiện khi xem thôn cụ thể và panel đang ẩn */}
+        <AnimatePresence>
+          {selectedVillage && !infoPanelOpen && (
+            <motion.button
+              key="open-panel-btn"
+              onClick={toggleInfoPanel}
+              title="Hiện thông tin chi tiết"
+              className={`
+                absolute top-3 left-3 z-20
+                flex items-center gap-2 px-3 py-2 rounded-xl
+                text-xs font-semibold shadow-lg backdrop-blur-sm
+                transition-colors
+                ${isDark
+                  ? 'bg-gov-900/80 text-gov-300 hover:bg-gov-800 border border-gov-700'
+                  : 'bg-white/90 text-gray-700 hover:bg-white border border-gray-200'
+                }
+              `}
+              initial={{ opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.2 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+            >
+              <PanelLeftOpen className="w-4 h-4" />
+              Thông tin
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* RIGHT — Sidebar */}
       <Sidebar

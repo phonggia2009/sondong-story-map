@@ -37,6 +37,7 @@ interface AppContextValue {
   // Info panel
   infoPanelOpen: boolean;
   setInfoPanelOpen: (open: boolean) => void;
+  toggleInfoPanel: () => void;
 
   // Theme
   isDark: boolean;
@@ -60,10 +61,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const selectVillage = useCallback((village: Village | null) => {
     setSelectedVillage(village);
-    if (village && !infoPanelOpen) {
+    if (village === null) {
+      // Auto-hide panel when returning to overview
+      setInfoPanelOpen(false);
+    } else if (!infoPanelOpen) {
       setInfoPanelOpen(true);
     }
   }, [infoPanelOpen]);
+
+  const toggleInfoPanel = useCallback(() => {
+    setInfoPanelOpen((o) => !o);
+  }, []);
 
   const enterPresentation = useCallback(() => {
     setIsPresenting(true);
@@ -100,6 +108,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     toggleSidebar,
     infoPanelOpen,
     setInfoPanelOpen,
+    toggleInfoPanel,
     isDark,
     toggleTheme,
     isFullscreen,
@@ -108,7 +117,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     selectedVillage, selectVillage,
     isPresenting, enterPresentation, exitPresentation, togglePresentation,
     sidebarOpen, setSidebarOpen, toggleSidebar,
-    infoPanelOpen, setInfoPanelOpen,
+    infoPanelOpen, setInfoPanelOpen, toggleInfoPanel,
     isDark, toggleTheme,
     isFullscreen, toggleFullscreen,
   ]);

@@ -67,7 +67,7 @@ function OverviewPanel({ isDark }: { isDark: boolean }) {
           Chọn một thôn để xem thông tin
         </h3>
         <p className={`text-xs ${isDark ? 'text-gov-500' : 'text-gray-400'}`}>
-          Nhấn vào thôn trong danh sách bên trái hoặc điều hướng bằng phím mũi tên
+          Nhấn vào thôn trong danh sách bên phải hoặc điều hướng bằng phím mũi tên
         </p>
       </div>
       <div className={`
