@@ -88,7 +88,7 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
         zoomControl={true}
       >
         <LayersControl position="topright">
-          <LayersControl.BaseLayer name="Bản đồ mặc định (OSM)" checked>
+          <LayersControl.BaseLayer name="Bản đồ mặc định (OSM)">
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -103,7 +103,7 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
             />
           </LayersControl.BaseLayer>
 
-          <LayersControl.BaseLayer name="Bản đồ sáng (CartoDB)">
+          <LayersControl.BaseLayer name="Bản đồ sáng (CartoDB)" checked>
             <TileLayer
               attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
               url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -122,11 +122,11 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
           <GeoJSON 
             data={ranhGioiXaData}
             style={{
-              color: '#f59e0b', // Amber/gold color for boundary
+              color: '#eab308', // Yellow for commune boundary
               weight: 3,
-              opacity: 0.8,
-              fillColor: '#f59e0b',
-              fillOpacity: 0.1
+              opacity: 1,
+              fillColor: 'transparent',
+              fillOpacity: 0
             }}
           />
         )}
@@ -141,22 +141,22 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
 
               if (hasSelection && !isSelected) {
                 return {
-                  color: '#94a3b8',
-                  weight: 1,
-                  opacity: 0.3,
-                  fillColor: '#cbd5e1',
-                  fillOpacity: 0.05,
+                  color: '#ef4444', // Red border
+                  weight: 2,
+                  opacity: 0.6,
+                  fillColor: '#fecaca', // Light red fill
+                  fillOpacity: 0.2,
                   dashArray: '4, 4'
                 };
               }
               
               return {
-                color: isSelected ? '#1d4ed8' : '#3b82f6', // Darker blue if selected
-                weight: isSelected ? 3 : 2,
-                opacity: isSelected ? 1 : 0.8,
-                fillColor: isSelected ? '#3b82f6' : '#3b82f6',
-                fillOpacity: isSelected ? 0.35 : 0.05,
-                dashArray: isSelected ? '' : '5, 5'
+                color: isSelected ? '#facc15' : 'white', // Yellow borders for selected, white for non-selected
+                weight: isSelected ? 4 : 2,
+                opacity: 1,
+                fillColor: isSelected ? '#eab308' : '#dc2626', // Yellow if selected, Red if not
+                fillOpacity: isSelected ? 0.7 : 0.4, // Higher opacity for more color
+                dashArray: isSelected ? '' : ''
               };
             }}
             onEachFeature={(feature, layer: any) => {
@@ -176,9 +176,9 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
                 mouseover: (e: any) => {
                   const target = e.target;
                   target.setStyle({
-                    fillColor: '#60a5fa', // Lighter blue on hover
-                    fillOpacity: 0.4,
-                    weight: 3,
+                    fillColor: isSelected ? '#eab308' : '#ef4444', // Keep yellow if selected, else lighter red
+                    fillOpacity: isSelected ? 0.8 : 0.5,
+                    weight: isSelected ? 4 : 3,
                   });
                   target.bringToFront();
                 },
@@ -186,21 +186,21 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
                   const target = e.target;
                   if (hasSelection && !isSelected) {
                     target.setStyle({
-                      color: '#94a3b8',
-                      weight: 1,
-                      opacity: 0.3,
-                      fillColor: '#cbd5e1',
-                      fillOpacity: 0.05,
+                      color: '#ef4444',
+                      weight: 2,
+                      opacity: 0.6,
+                      fillColor: '#fecaca',
+                      fillOpacity: 0.2,
                       dashArray: '4, 4'
                     });
                   } else {
                     target.setStyle({
-                      color: isSelected ? '#1d4ed8' : '#3b82f6',
-                      weight: isSelected ? 3 : 2,
-                      opacity: isSelected ? 1 : 0.8,
-                      fillColor: isSelected ? '#3b82f6' : '#3b82f6',
-                      fillOpacity: isSelected ? 0.35 : 0.05,
-                      dashArray: isSelected ? '' : '5, 5'
+                      color: isSelected ? '#facc15' : 'white',
+                      weight: isSelected ? 4 : 2,
+                      opacity: 1,
+                      fillColor: isSelected ? '#eab308' : '#dc2626',
+                      fillOpacity: isSelected ? 0.7 : 0.4,
+                      dashArray: isSelected ? '' : ''
                     });
                   }
                 },
