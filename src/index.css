@@ -118,6 +118,26 @@
     }
   }
 
+  /* Pulse Glow for selected map feature */
+  .animate-pulse-glow {
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.4)); }
+    50% { filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.9)); }
+  }
+
+  /* Marching ants for commune boundary */
+  .animate-marching-ants {
+    stroke-dasharray: 12, 12 !important;
+    animation: march 1.5s linear infinite;
+  }
+
+  @keyframes march {
+    to { stroke-dashoffset: -24; }
+  }
+
   /* Gradient text */
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-400 to-gov-300;

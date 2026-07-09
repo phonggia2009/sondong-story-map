@@ -35,14 +35,19 @@ export const Footer = memo(function Footer() {
   };
 
   return (
-    <footer className={`
+    <motion.footer 
+      className={`
       flex-shrink-0 flex items-center justify-between px-4 h-9 text-xs
       border-t transition-colors duration-300
       ${isDark
         ? 'bg-gov-950 border-gov-800/60 text-gov-500'
         : 'bg-gray-50 border-gray-200 text-gray-400'
       }
-    `}>
+    `}
+      initial={{ y: 36 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
+    >
       {/* Left — branding */}
       <span className="truncate max-w-[200px]">
         {APP_CONFIG.title} — {APP_CONFIG.organization}
@@ -98,6 +103,6 @@ export const Footer = memo(function Footer() {
 
       {/* Right — copyright */}
       <span>© {new Date().getFullYear()}</span>
-    </footer>
+    </motion.footer>
   );
 });

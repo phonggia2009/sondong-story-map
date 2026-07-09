@@ -14,6 +14,7 @@ import { BoundaryRow } from './BoundaryRow';
 import { LandmarkList } from './LandmarkList';
 
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import type { Village } from '@/types';
 
 // ============================================================
@@ -54,7 +55,9 @@ function StatCard({
         {icon}
         <p className={`text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gov-400' : 'text-gray-500'}`}>{label}</p>
       </div>
-      <p className={`text-lg font-bold font-display tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>{value}</p>
+      <p className={`text-lg font-bold font-display tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
+        {typeof value === 'number' ? <AnimatedNumber value={value} /> : value}
+      </p>
     </motion.div>
   );
 }

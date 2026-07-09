@@ -126,7 +126,8 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
               weight: 3,
               opacity: 1,
               fillColor: 'transparent',
-              fillOpacity: 0
+              fillOpacity: 0,
+              className: 'animate-marching-ants'
             }}
           />
         )}
@@ -146,7 +147,8 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
                   opacity: 0.6,
                   fillColor: '#fecaca', // Light red fill
                   fillOpacity: 0.2,
-                  dashArray: '4, 4'
+                  dashArray: '4, 4',
+                  className: 'transition-all duration-300'
                 };
               }
               
@@ -156,7 +158,8 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
                 opacity: 1,
                 fillColor: isSelected ? '#eab308' : '#dc2626', // Yellow if selected, Red if not
                 fillOpacity: isSelected ? 0.7 : 0.4, // Higher opacity for more color
-                dashArray: isSelected ? '' : ''
+                dashArray: isSelected ? '' : '',
+                className: isSelected ? 'animate-pulse-glow transition-all duration-300' : 'transition-all duration-300'
               };
             }}
             onEachFeature={(feature, layer: any) => {
