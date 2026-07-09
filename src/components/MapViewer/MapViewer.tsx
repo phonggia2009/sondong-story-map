@@ -234,6 +234,25 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
               <Marker 
                 key={`label-${index}`} 
                 position={[coordinates[1], coordinates[0]]}
+                icon={L.divIcon({
+                  html: `<div style="
+                    text-align: center;
+                    text-shadow: 1px 1px 0px #fff, -1px 1px 0px #fff, 1px -1px 0px #fff, -1px -1px 0px #fff, 0px 1px 2px rgba(0,0,0,0.5);
+                    font-family: 'Be Vietnam Pro', sans-serif;
+                    font-weight: 800;
+                    font-size: ${isSelected ? '14px' : '11px'};
+                    color: ${isSelected ? '#eab308' : '#374151'};
+                    white-space: nowrap;
+                    text-transform: uppercase;
+                    transition: all 0.3s ease;
+                    letter-spacing: 0.5px;
+                  ">
+                    ${name}
+                  </div>`,
+                  className: 'bg-transparent border-0 shadow-none',
+                  iconSize: [100, 30],
+                  iconAnchor: [50, 15]
+                })}
                 eventHandlers={{
                   click: () => {
                     // Stop propagation so MapClickHandler doesn't deselect
@@ -255,21 +274,7 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
                     }
                   }
                 }}
-              >
-                <Tooltip 
-                  permanent 
-                  direction="top" 
-                  className={`font-bold text-xs shadow-sm rounded px-2 py-1 cursor-pointer transition-all duration-300 border ${
-                    isSelected 
-                      ? 'bg-blue-600 text-white border-blue-700 shadow-md scale-110 z-50' 
-                      : hasSelection
-                        ? 'bg-white/40 text-gray-400 border-gray-200 opacity-60'
-                        : 'bg-white/90 text-gray-800 border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  {name}
-                </Tooltip>
-              </Marker>
+              />
             );
           }
           return null;
