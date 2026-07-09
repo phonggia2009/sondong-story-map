@@ -227,7 +227,8 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
           if (feature.geometry?.type === 'Point') {
             const coordinates = feature.geometry.coordinates;
             const name = feature.properties.ten_thon;
-            const isSelected = selectedVillage?.geojson_label_index === index;
+            const villageId = feature.properties.village_id;
+            const isSelected = selectedVillage?.id === villageId;
             const hasSelection = !!selectedVillage;
             // GeoJSON coordinates are [lng, lat]
             return (
@@ -255,22 +256,10 @@ export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerP
                 })}
                 eventHandlers={{
                   click: () => {
-                    // Stop propagation so MapClickHandler doesn't deselect
-                    const matchedVillage = villages.find((v: Village) => v.geojson_label_index === index);
-                    if (!matchedVillage) {
-                      // Fallback: find closest village by coordinates
-                      let closest: Village | null = null;
-                      let minDist = Infinity;
-                      villages.forEach((v: Village) => {
-                        if (!v.coordinates) return;
-                        const dx = v.coordinates.lat - coordinates[1];
-                        const dy = v.coordinates.lng - coordinates[0];
-                        const dist = dx * dx + dy * dy;
-                        if (dist < minDist) { minDist = dist; closest = v; }
-                      });
-                      if (closest) selectVillage(closest);
-                    } else {
-                      selectVillage(matchedVillage);
+                    const villageId = feature.properties?.village_id;
+                    if (villageId !== undefined) {
+                      const matchedVillage = villages.find((v: Village) => v.id === villageId);
+                      if (matchedVillage) selectVillage(matchedVillage);
                     }
                   }
                 }}
