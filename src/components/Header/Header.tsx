@@ -7,7 +7,6 @@ import {
   Maximize,
   Minimize,
   Monitor,
-  ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
@@ -25,8 +24,6 @@ export const Header = memo(function Header() {
     toggleFullscreen,
     isPresenting,
     exitPresentation,
-    sidebarOpen,
-    toggleSidebar,
     selectedVillage,
   } = useAppContext();
 
@@ -46,28 +43,6 @@ export const Header = memo(function Header() {
     >
       {/* Left — Logo + Title */}
       <div className="flex items-center gap-3">
-        {/* Sidebar toggle */}
-        {!isPresenting && (
-          <motion.button
-            onClick={toggleSidebar}
-            className={`
-              p-1.5 rounded-lg transition-colors
-              ${isDark
-                ? 'text-gov-400 hover:text-white hover:bg-gov-800'
-                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
-              }
-            `}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            title={sidebarOpen ? 'Ẩn thanh bên' : 'Hiện thanh bên'}
-          >
-            {sidebarOpen
-              ? <ChevronLeft className="w-5 h-5" />
-              : <ChevronRight className="w-5 h-5" />
-            }
-          </motion.button>
-        )}
-
         {/* Map icon */}
         <div className="flex items-center gap-2.5">
           <div className={`

@@ -85,6 +85,17 @@
     font-size: 0.7rem;
     min-width: 1.4rem;
   }
+
+  /* Leaflet polygon hover tooltip */
+  .custom-polygon-tooltip {
+    @apply rounded-lg shadow-lg border-none px-3 py-2;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(8px);
+  }
+
+  .custom-polygon-tooltip::before {
+    border-top-color: rgba(255, 255, 255, 0.95) !important;
+  }
 }
 
 /* ============================================================
@@ -121,21 +132,6 @@
 }
 
 /* ============================================================
-   REACT ZOOM PAN PINCH OVERRIDES
-   ============================================================ */
-
-.react-transform-wrapper {
-  width: 100% !important;
-  height: 100% !important;
-  overflow: hidden !important;
-}
-
-.react-transform-component {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* ============================================================
    PRESENTATION MODE
    ============================================================ */
 
@@ -157,4 +153,11 @@
 
 :focus-visible {
   @apply outline-2 outline-offset-2 outline-accent-500 rounded-sm;
+}
+
+/* ============================================================
+   LEAFLET FIXES
+   ============================================================ */
+.leaflet-container *:focus {
+  outline: none !important;
 }

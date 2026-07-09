@@ -1,27 +1,52 @@
-import { memo } from 'react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { memo, useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON, LayersControl, Tooltip, useMapEvents } from 'react-leaflet';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ImageWithFallback } from './ImageWithFallback';
-import { Toolbar } from '@/components/Toolbar/Toolbar';
+import type { Village } from '@/types';
+import { useAppContext } from '@/context/AppContext';
+import { useVillages } from '@/hooks/useVillages';
+import { MapOverlayStats } from './MapOverlayStats';
+
 
 // ============================================================
 //  MapViewer Component
-//  Center panel with zoom/pan + animated image transitions.
+//  Center panel with Leaflet map
 // ============================================================
 
 interface MapViewerProps {
-  imageUrl: string;
-  imageAlt: string;
-  isOverview: boolean;
-  label?: string;
+  selectedVillage: Village | null;
 }
 
-export const MapViewer = memo(function MapViewer({
-  imageUrl,
-  imageAlt,
-  isOverview,
-  label,
-}: MapViewerProps) {
+// Click handler: deselect village when clicking empty map area
+function MapClickHandler({ onDeselect }: { onDeselect: () => void }) {
+  useMapEvents({
+    click: (e: any) => {
+      // Only deselect if the click was NOT on a layer (polygon/marker)
+      if (!e.originalEvent._stopped) {
+        onDeselect();
+      }
+    },
+  });
+  return null;
+}
+
+export const MapViewer = memo(function MapViewer({ selectedVillage }: MapViewerProps) {
+  const isOverview = !selectedVillage;
+  const label = selectedVillage?.name;
+
+  const { selectVillage } = useAppContext();
+  const { villages } = useVillages();
+
+
+  const [ranhGioiXaData, setRanhGioiXaData] = useState<any>(null);
+  const [ranhGioiThonData, setRanhGioiThonData] = useState<any>(null);
+  const [thonNhanTenData, setThonNhanTenData] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/data/danhgioixa.geojson').then(r => r.json()).then(setRanhGioiXaData).catch(console.error);
+    fetch('/data/ranhgioithon.geojson').then(r => r.json()).then(setRanhGioiThonData).catch(console.error);
+    fetch('/data/thon_nhan_ten.geojson').then(r => r.json()).then(setThonNhanTenData).catch(console.error);
+  }, []);
+
   return (
     <div className="relative flex-1 flex flex-col overflow-hidden bg-gov-950">
       {/* Label overlay */}
@@ -29,7 +54,7 @@ export const MapViewer = memo(function MapViewer({
         {label && (
           <motion.div
             key={label}
-            className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-[400] pointer-events-none"
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
@@ -45,57 +70,209 @@ export const MapViewer = memo(function MapViewer({
         )}
       </AnimatePresence>
 
-      {/* Zoom/Pan Wrapper */}
-      <TransformWrapper
-        key={imageUrl}  // Reset transform when image changes
-        initialScale={1}
-        minScale={0.3}
-        maxScale={8}
-        wheel={{ step: 0.08 }}
-        doubleClick={{ step: 0.7 }}
-        centerOnInit
-        limitToBounds={false}
+      <MapContainer 
+        center={[21.037, 105.703]} 
+        zoom={14} 
+        className="w-full h-full z-0"
+        zoomControl={true}
       >
-        {({ zoomIn, zoomOut, resetTransform }) => (
-          <>
-            <TransformComponent
-              wrapperClass="!w-full !h-full"
-              contentClass="!w-full !h-full"
-            >
-              {/* Animated image cross-fade */}
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={imageUrl}
-                  className="w-full h-full min-h-[400px]"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.02 }}
-                  transition={{ duration: 0.45, ease: 'easeInOut' }}
-                >
-                  <ImageWithFallback
-                    src={imageUrl}
-                    alt={imageAlt}
-                    className="w-full h-full"
-                    fallbackText={imageAlt}
-                    svgFallback={isOverview ? '/maps/overview.png' : undefined}
-                    priority
-                  />
-                </motion.div>
-              </AnimatePresence>
-            </TransformComponent>
-
-            {/* Toolbar (zoom controls) */}
-            <Toolbar
-              onZoomIn={() => zoomIn()}
-              onZoomOut={() => zoomOut()}
-              onReset={() => resetTransform()}
+        <LayersControl position="topright">
+          <LayersControl.BaseLayer name="Bản đồ mặc định (OSM)" checked>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-          </>
+          </LayersControl.BaseLayer>
+          
+          <LayersControl.BaseLayer name="Bản đồ vệ tinh (Esri)">
+            <TileLayer
+              attribution='&copy; <a href="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer">Esri</a>'
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              maxZoom={19}
+            />
+          </LayersControl.BaseLayer>
+
+          <LayersControl.BaseLayer name="Bản đồ sáng (CartoDB)">
+            <TileLayer
+              attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            />
+          </LayersControl.BaseLayer>
+
+          <LayersControl.BaseLayer name="Bản đồ tối (CartoDB)">
+            <TileLayer
+              attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            />
+          </LayersControl.BaseLayer>
+        </LayersControl>
+
+        {ranhGioiXaData && (
+          <GeoJSON 
+            data={ranhGioiXaData}
+            style={{
+              color: '#f59e0b', // Amber/gold color for boundary
+              weight: 3,
+              opacity: 0.8,
+              fillColor: '#f59e0b',
+              fillOpacity: 0.1
+            }}
+          />
         )}
-      </TransformWrapper>
+
+        {ranhGioiThonData && (
+          <GeoJSON 
+            key={`geojson-${selectedVillage?.id || 'none'}`}
+            data={ranhGioiThonData}
+            style={(feature: any) => {
+              const isSelected = selectedVillage?.id === feature.properties.village_id;
+              const hasSelection = !!selectedVillage;
+
+              if (hasSelection && !isSelected) {
+                return {
+                  color: '#94a3b8',
+                  weight: 1,
+                  opacity: 0.3,
+                  fillColor: '#cbd5e1',
+                  fillOpacity: 0.05,
+                  dashArray: '4, 4'
+                };
+              }
+              
+              return {
+                color: isSelected ? '#1d4ed8' : '#3b82f6', // Darker blue if selected
+                weight: isSelected ? 3 : 2,
+                opacity: isSelected ? 1 : 0.8,
+                fillColor: isSelected ? '#3b82f6' : '#3b82f6',
+                fillOpacity: isSelected ? 0.35 : 0.05,
+                dashArray: isSelected ? '' : '5, 5'
+              };
+            }}
+            onEachFeature={(feature, layer: any) => {
+              const isSelected = selectedVillage?.id === feature.properties.village_id;
+              const hasSelection = !!selectedVillage;
+
+              // Bind tooltip with village name for hover preview
+              const matchedVillage = villages.find((v: Village) => v.id === feature.properties.village_id);
+              if (matchedVillage) {
+                layer.bindTooltip(
+                  `<div style="font-weight:700;font-size:13px;margin-bottom:2px">${matchedVillage.name}</div><div style="font-size:11px;color:#6b7280">Diện tích: ${matchedVillage.area}</div>`,
+                  { sticky: true, direction: 'auto', className: 'custom-polygon-tooltip' }
+                );
+              }
+              
+              layer.on({
+                mouseover: (e: any) => {
+                  const target = e.target;
+                  target.setStyle({
+                    fillColor: '#60a5fa', // Lighter blue on hover
+                    fillOpacity: 0.4,
+                    weight: 3,
+                  });
+                  target.bringToFront();
+                },
+                mouseout: (e: any) => {
+                  const target = e.target;
+                  if (hasSelection && !isSelected) {
+                    target.setStyle({
+                      color: '#94a3b8',
+                      weight: 1,
+                      opacity: 0.3,
+                      fillColor: '#cbd5e1',
+                      fillOpacity: 0.05,
+                      dashArray: '4, 4'
+                    });
+                  } else {
+                    target.setStyle({
+                      color: isSelected ? '#1d4ed8' : '#3b82f6',
+                      weight: isSelected ? 3 : 2,
+                      opacity: isSelected ? 1 : 0.8,
+                      fillColor: isSelected ? '#3b82f6' : '#3b82f6',
+                      fillOpacity: isSelected ? 0.35 : 0.05,
+                      dashArray: isSelected ? '' : '5, 5'
+                    });
+                  }
+                },
+                click: (e: any) => {
+                  // Stop propagation so MapClickHandler doesn't deselect
+                  e.originalEvent._stopped = true;
+                  const villageId = feature.properties?.village_id;
+                  if (villageId !== undefined) {
+                    const matchedVillage = villages.find((v: Village) => v.id === villageId);
+                    if (matchedVillage) {
+                      selectVillage(matchedVillage);
+                    }
+                  }
+                }
+              });
+            }}
+          />
+        )}
+
+        {thonNhanTenData?.features?.map((feature: any, index: number) => {
+          if (feature.geometry?.type === 'Point') {
+            const coordinates = feature.geometry.coordinates;
+            const name = feature.properties.ten_thon;
+            const isSelected = selectedVillage?.geojson_label_index === index;
+            const hasSelection = !!selectedVillage;
+            // GeoJSON coordinates are [lng, lat]
+            return (
+              <Marker 
+                key={`label-${index}`} 
+                position={[coordinates[1], coordinates[0]]}
+                eventHandlers={{
+                  click: () => {
+                    // Stop propagation so MapClickHandler doesn't deselect
+                    const matchedVillage = villages.find((v: Village) => v.geojson_label_index === index);
+                    if (!matchedVillage) {
+                      // Fallback: find closest village by coordinates
+                      let closest: Village | null = null;
+                      let minDist = Infinity;
+                      villages.forEach((v: Village) => {
+                        if (!v.coordinates) return;
+                        const dx = v.coordinates.lat - coordinates[1];
+                        const dy = v.coordinates.lng - coordinates[0];
+                        const dist = dx * dx + dy * dy;
+                        if (dist < minDist) { minDist = dist; closest = v; }
+                      });
+                      if (closest) selectVillage(closest);
+                    } else {
+                      selectVillage(matchedVillage);
+                    }
+                  }
+                }}
+              >
+                <Tooltip 
+                  permanent 
+                  direction="top" 
+                  className={`font-bold text-xs shadow-sm rounded px-2 py-1 cursor-pointer transition-all duration-300 border ${
+                    isSelected 
+                      ? 'bg-blue-600 text-white border-blue-700 shadow-md scale-110 z-50' 
+                      : hasSelection
+                        ? 'bg-white/40 text-gray-400 border-gray-200 opacity-60'
+                        : 'bg-white/90 text-gray-800 border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  {name}
+                </Tooltip>
+              </Marker>
+            );
+          }
+          return null;
+        })}
+        
+
+
+
+        <MapClickHandler onDeselect={() => selectVillage(null)} />
+
+      </MapContainer>
+
+      {/* Floating stats overlay */}
+      <MapOverlayStats />
 
       {/* Corner grid decoration */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-gov-800 via-accent-600/40 to-gov-800 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-gov-800 via-accent-600/40 to-gov-800 pointer-events-none z-[400]" />
     </div>
   );
 });

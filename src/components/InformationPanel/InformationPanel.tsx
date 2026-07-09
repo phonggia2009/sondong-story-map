@@ -13,6 +13,7 @@ import { useAppContext } from '@/context/AppContext';
 import { BoundaryRow } from './BoundaryRow';
 import { LandmarkList } from './LandmarkList';
 
+import { useIsMobile } from '@/hooks/useIsMobile';
 import type { Village } from '@/types';
 
 // ============================================================
@@ -37,14 +38,24 @@ function StatCard({
   isDark: boolean;
 }) {
   return (
-    <div className={`
-      flex flex-col gap-1 p-3 rounded-xl
-      ${isDark ? 'bg-gov-800/60' : 'bg-gray-50'}
+    <motion.div 
+      variants={{
+        hidden: { opacity: 0, y: 10 },
+        visible: { opacity: 1, y: 0 }
+      }}
+      className={`
+      flex flex-col gap-1.5 p-3.5 rounded-xl border
+      ${isDark 
+        ? 'bg-gradient-to-br from-gov-800/80 to-gov-900/80 border-gov-700/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]' 
+        : 'bg-gradient-to-br from-white to-gray-50 border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.03)]'
+      }
     `}>
-      <div className={`${isDark ? 'text-gov-500' : 'text-gray-400'}`}>{icon}</div>
-      <p className={`text-xs ${isDark ? 'text-gov-400' : 'text-gray-500'}`}>{label}</p>
-      <p className={`text-sm font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>{value}</p>
-    </div>
+      <div className={`flex items-center gap-2 ${isDark ? 'text-gov-400' : 'text-gray-400'}`}>
+        {icon}
+        <p className={`text-xs font-medium uppercase tracking-wider ${isDark ? 'text-gov-400' : 'text-gray-500'}`}>{label}</p>
+      </div>
+      <p className={`text-lg font-bold font-display tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>{value}</p>
+    </motion.div>
   );
 }
 
@@ -67,7 +78,7 @@ function OverviewPanel({ isDark }: { isDark: boolean }) {
           Chọn một thôn để xem thông tin
         </h3>
         <p className={`text-xs ${isDark ? 'text-gov-500' : 'text-gray-400'}`}>
-          Nhấn vào thôn trong danh sách bên phải hoặc điều hướng bằng phím mũi tên
+          Nhấn vào ranh giới hoặc tên thôn trên bản đồ để xem chi tiết
         </p>
       </div>
       <div className={`
@@ -87,21 +98,33 @@ export const InformationPanel = memo(function InformationPanel({
   onClose,
 }: InformationPanelProps) {
   const { isDark } = useAppContext();
+  const isMobile = useIsMobile();
 
   return (
     <motion.aside
       className={`
-        flex flex-col w-80 flex-shrink-0 h-full border-l
-        transition-colors duration-300 overflow-hidden
+        flex flex-col flex-shrink-0 transition-colors duration-300 overflow-hidden
+        ${isMobile 
+          ? 'absolute bottom-0 left-0 right-0 z-50 h-[60vh] rounded-t-2xl shadow-2xl border-t' 
+          : 'w-80 h-full border-l'
+        }
         ${isDark
           ? 'bg-gov-950 border-gov-800'
           : 'bg-white border-gray-200'
         }
       `}
-      initial={{ x: 40, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
+      initial={isMobile ? { y: 300, opacity: 0 } : { x: 40, opacity: 0 }}
+      animate={isMobile ? { y: 0, opacity: 1 } : { x: 0, opacity: 1 }}
+      exit={isMobile ? { y: 300, opacity: 0 } : { x: 40, opacity: 0 }}
       transition={{ duration: 0.35, ease: 'easeOut' }}
     >
+      {/* Mobile drag handle */}
+      {isMobile && (
+        <div className="flex-shrink-0 flex justify-center py-2">
+          <div className={`w-10 h-1 rounded-full ${isDark ? 'bg-gov-600' : 'bg-gray-300'}`} />
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
         {!village ? (
           <OverviewPanel key="overview" isDark={isDark} />
@@ -115,22 +138,19 @@ export const InformationPanel = memo(function InformationPanel({
             transition={{ duration: 0.3, ease: 'easeOut' }}
           >
             {/* Village name header */}
-            <div className={`flex-shrink-0 flex items-center justify-between px-4 py-4 border-b ${
-              isDark ? 'border-gov-800' : 'border-gray-200'
-            }`}>
-              <h2 className={`text-base font-display font-bold leading-tight ${
-                isDark ? 'text-white' : 'text-gray-800'
+            <div className={`flex-shrink-0 flex items-center justify-between px-4 py-4 border-b ${isDark ? 'border-gov-800' : 'border-gray-200'
               }`}>
+              <h2 className={`text-base font-display font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-800'
+                }`}>
                 {village.name}
               </h2>
               {onClose && (
                 <motion.button
                   onClick={onClose}
-                  className={`p-1.5 rounded-full transition-colors ${
-                    isDark
+                  className={`p-1.5 rounded-full transition-colors ${isDark
                       ? 'text-gov-400 hover:bg-gov-800 hover:text-white'
                       : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'
-                  }`}
+                    }`}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -139,8 +159,19 @@ export const InformationPanel = memo(function InformationPanel({
               )}
             </div>
 
-            {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+            {/* Scrollable content with stagger */}
+            <motion.div 
+              className="flex-1 overflow-y-auto px-4 py-4 space-y-5"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.08, delayChildren: 0.1 }
+                }
+              }}
+              initial="hidden"
+              animate="visible"
+            >
 
               {/* Stats grid */}
               <div className="grid grid-cols-2 gap-2">
@@ -218,7 +249,7 @@ export const InformationPanel = memo(function InformationPanel({
 
               {/* Bottom padding */}
               <div className="h-4" />
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

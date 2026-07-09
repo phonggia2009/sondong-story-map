@@ -21,6 +21,8 @@ export interface Village {
     lng: number;
   };
   polygon?: [number, number][];  // future GeoJSON support
+  geojson_boundary_index?: number;
+  geojson_label_index?: number;
 }
 
 // ============================================================

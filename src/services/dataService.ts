@@ -59,23 +59,23 @@ export async function fetchVillages(): Promise<Village[]> {
       throw new Error(`Thôn số ${index + 1}: Trường "name" bắt buộc.`);
 
     return {
-      id:           raw.id as number,
-      name:         (raw.name as string) || `Thôn ${index + 1}`,
-      image:        typeof raw.image === 'string' ? raw.image : '',
-      area:         typeof raw.area === 'string' ? raw.area : 'N/A',
+      id: raw.id as number,
+      name: (raw.name as string) || `Thôn ${index + 1}`,
+      image: typeof raw.image === 'string' ? raw.image : '',
+      area: typeof raw.area === 'string' ? raw.area : 'N/A',
       partyMembers: typeof raw.partyMembers === 'number' ? raw.partyMembers : 0,
-      households:   typeof raw.households === 'number' ? raw.households : undefined,
-      population:   typeof raw.population === 'number' ? raw.population : undefined,
-      north:        typeof raw.north === 'string' ? raw.north : '',
-      south:        typeof raw.south === 'string' ? raw.south : '',
-      east:         typeof raw.east === 'string' ? raw.east : '',
-      west:         typeof raw.west === 'string' ? raw.west : '',
-      landmarks:    Array.isArray(raw.landmarks)
+      households: typeof raw.households === 'number' ? raw.households : undefined,
+      population: typeof raw.population === 'number' ? raw.population : undefined,
+      north: typeof raw.north === 'string' ? raw.north : '',
+      south: typeof raw.south === 'string' ? raw.south : '',
+      east: typeof raw.east === 'string' ? raw.east : '',
+      west: typeof raw.west === 'string' ? raw.west : '',
+      landmarks: Array.isArray(raw.landmarks)
         ? (raw.landmarks as unknown[]).filter((l): l is string => typeof l === 'string')
         : [],
-      description:  typeof raw.description === 'string' ? raw.description : '',
-      coordinates:  raw.coordinates as Village['coordinates'],
-      polygon:      raw.polygon as Village['polygon'],
+      description: typeof raw.description === 'string' ? raw.description : '',
+      coordinates: raw.coordinates as Village['coordinates'],
+      polygon: raw.polygon as Village['polygon'],
     } satisfies Village;
   });
 }

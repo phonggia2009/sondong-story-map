@@ -8,16 +8,16 @@ import type { AppConfig } from '@/types';
 
 export const APP_CONFIG: AppConfig = {
   // ─── Identity ─────────────────────────────────────────────
-  title: 'Hệ Thống Bản Đồ Hành Chính',
-  subtitle: 'Nền Tảng Trình Bày Ranh Giới Hành Chính',
-  organization: 'UBND Xã Sơn Đồng',
+  title: 'Bản đồ xã Sơn Đồng',
+  subtitle: 'UBND Xã Sơn Đồng',
+  organization: 'Bản đồ hành chính sau sáp nhập',
   logo: null, // Set to '/logo.png' if you have a logo
 
   // ─── Brand Colors ──────────────────────────────────────────
   colors: {
     primary: '#1e3a8a',   // Government deep blue
-    accent:  '#3b82f6',   // Interactive blue
-    gold:    '#f59e0b',   // Accent gold for highlights
+    accent: '#3b82f6',   // Interactive blue
+    gold: '#f59e0b',   // Accent gold for highlights
   },
 
   // ─── Animation ─────────────────────────────────────────────
@@ -35,9 +35,9 @@ export const APP_CONFIG: AppConfig = {
 
   // ─── Public Asset Paths ────────────────────────────────────
   paths: {
-    maps:     '/maps',
+    maps: '/maps',
     villages: '/villages',
-    data:     '/data',
+    data: '/data',
   },
 };
 
@@ -60,7 +60,7 @@ export const getDataUrl = (): string =>
 
 /** Interval labels in Vietnamese for the UI */
 export const INTERVAL_LABELS: Record<number, string> = {
-  5000:  '5 giây',
+  5000: '5 giây',
   10000: '10 giây',
   15000: '15 giây',
   30000: '30 giây',
@@ -70,13 +70,13 @@ export const INTERVAL_LABELS: Record<number, string> = {
 export const DIRECTION_LABELS: Record<string, string> = {
   north: 'Phía Bắc',
   south: 'Phía Nam',
-  east:  'Phía Đông',
-  west:  'Phía Tây',
+  east: 'Phía Đông',
+  west: 'Phía Tây',
 };
 
 export const DIRECTION_ICONS: Record<string, string> = {
   north: '↑',
   south: '↓',
-  east:  '→',
-  west:  '←',
+  east: '→',
+  west: '←',
 };

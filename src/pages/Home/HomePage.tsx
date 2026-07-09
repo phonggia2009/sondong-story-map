@@ -4,18 +4,15 @@ import { PanelLeftOpen } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { useVillages } from '@/hooks/useVillages';
 import { useKeyboard } from '@/hooks/useKeyboard';
-import { useImagePreloader } from '@/hooks/useImagePreloader';
-import { Sidebar } from '@/components/Sidebar/Sidebar';
 import { MapViewer } from '@/components/MapViewer/MapViewer';
 import { InformationPanel } from '@/components/InformationPanel/InformationPanel';
 import { LoadingScreen } from '@/components/Loading/LoadingScreen';
 import { EmptyState } from '@/components/EmptyState/EmptyState';
-import { getOverviewMapUrl, getVillageImageUrl } from '@/config';
-import type { Village } from '@/types';
 
 // ============================================================
 //  HomePage
-//  Three-panel layout: Sidebar | MapViewer | InformationPanel
+//  Map-first layout: MapViewer (full) + InformationPanel overlay
+//  Users click directly on the map to select a village
 // ============================================================
 
 export default function HomePage() {
@@ -37,11 +34,7 @@ export default function HomePage() {
     return villages.findIndex((v) => v.id === selectedVillage.id);
   }, [selectedVillage, villages]);
 
-  // Navigation handlers
-  const handleVillageSelect = useCallback((village: Village) => {
-    selectVillage(village);
-  }, [selectVillage]);
-
+  // Navigation handlers (keyboard arrows cycle through villages)
   const handlePrev = useCallback(() => {
     if (villages.length === 0) return;
     const idx = selectedVillage
@@ -58,22 +51,12 @@ export default function HomePage() {
     selectVillage(villages[idx]);
   }, [villages, selectedVillage, currentIndex, selectVillage]);
 
-  // Image preloading for adjacent villages
-  useImagePreloader(villages, currentIndex);
-
   // Keyboard shortcuts
   useKeyboard([
-    { key: 'ArrowLeft',  handler: handlePrev, description: 'Village précédente' },
-    { key: 'ArrowRight', handler: handleNext, description: 'Village suivante' },
-    { key: 'Escape',     handler: () => selectVillage(null), description: 'Retour à la vue générale' },
+    { key: 'ArrowLeft', handler: handlePrev, description: 'Thôn trước' },
+    { key: 'ArrowRight', handler: handleNext, description: 'Thôn tiếp theo' },
+    { key: 'Escape', handler: () => selectVillage(null), description: 'Quay về tổng quan' },
   ], !isPresenting);
-
-  // Computed values
-  const imageUrl = selectedVillage
-    ? getVillageImageUrl(selectedVillage.image)
-    : getOverviewMapUrl();
-
-  const imageAlt = selectedVillage?.name ?? 'Bản đồ tổng quan';
 
   if (isLoading) return <LoadingScreen />;
 
@@ -99,12 +82,12 @@ export default function HomePage() {
 
   return (
     <motion.div
-      className="flex flex-1 overflow-hidden"
+      className="flex flex-1 overflow-hidden relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* LEFT — Information Panel (chỉ hiện khi có thôn được chọn) */}
+      {/* LEFT — Information Panel (slides in when a village is selected on the map) */}
       <AnimatePresence>
         {infoPanelOpen && selectedVillage && (
           <InformationPanel
@@ -114,13 +97,10 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
-      {/* CENTER — Map Viewer */}
+      {/* FULL — Map Viewer */}
       <div className="relative flex-1 flex overflow-hidden">
         <MapViewer
-          imageUrl={imageUrl}
-          imageAlt={imageAlt}
-          isOverview={!selectedVillage}
-          label={selectedVillage?.name ?? 'Tổng quan'}
+          selectedVillage={selectedVillage}
         />
 
         {/* Nút mở lại panel — chỉ hiện khi xem thôn cụ thể và panel đang ẩn */}
@@ -153,15 +133,7 @@ export default function HomePage() {
           )}
         </AnimatePresence>
       </div>
-
-      {/* RIGHT — Sidebar */}
-      <Sidebar
-        villages={villages}
-        currentIndex={currentIndex}
-        onVillageSelect={handleVillageSelect}
-        onPrev={handlePrev}
-        onNext={handleNext}
-      />
     </motion.div>
   );
 }
+
